@@ -10,18 +10,17 @@ export default function Signup() {
   const [password, setPassword] = useState('');
 
   const handleSignup = async () => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+  })
 
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Account Created!");
-      router.push('/login');
-    }
-  };
+  if (error) {
+    alert(error.message)
+  } else {
+    alert('Signup successful! Check your email.')
+  }
+}
 
   return (
     <View style={styles.container}>

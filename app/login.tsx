@@ -10,6 +10,11 @@ export default function Login() {
   const router = useRouter()
 
   const handleSignup = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password')
+      return
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -17,6 +22,12 @@ export default function Login() {
 
     if (error) {
       Alert.alert('Error', error.message)
+      return
+    }
+
+    // ⚠️ Check if user exists
+    if (!data?.user) {
+      Alert.alert('Error', 'Signup failed. Try again.')
       return
     }
 
@@ -33,10 +44,15 @@ export default function Login() {
       return
     }
 
-    Alert.alert('Success', 'Account created! Please login.')
+    Alert.alert('Success', 'Account created! Now login.')
   }
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password')
+      return
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -58,6 +74,7 @@ export default function Login() {
         style={styles.input}
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
       />
 
       <TextInput
@@ -89,7 +106,10 @@ export default function Login() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#34C759' }]} onPress={handleSignup}>
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: '#34C759' }]} 
+        onPress={handleSignup}
+      >
         <Text style={styles.buttonText}>Signup</Text>
       </TouchableOpacity>
     </View>

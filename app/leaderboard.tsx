@@ -1,11 +1,11 @@
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    View
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native'
 import { supabase } from '../supabase'
 
@@ -14,8 +14,12 @@ export default function Leaderboard() {
 
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [currentUserId, setCurrentUserId] = useState(null)
 
   const fetchLeaderboard = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setCurrentUserId(user.id)
+
     const { data, error } = await supabase
       .from('results')
       .select(`
@@ -47,6 +51,21 @@ export default function Leaderboard() {
     )
   }
 
+  if (data.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text>No leaderboard data yet</Text>
+      </View>
+    )
+  }
+
+  const getRankIcon = (index) => {
+    if (index === 0) return '🥇'
+    if (index === 1) return '🥈'
+    if (index === 2) return '🥉'
+    return `#${index + 1}`
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🏆 Leaderboard</Text>
@@ -54,20 +73,31 @@ export default function Leaderboard() {
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.card}>
-            <Text style={styles.rank}>#{index + 1}</Text>
+        renderItem={({ item, index }) => {
+          const isCurrentUser = item.user_id === currentUserId
 
-            <View>
-              <Text style={styles.email}>
-                {item.users?.email || 'User'}
+          return (
+            <View
+              style={[
+                styles.card,
+                isCurrentUser && styles.highlight
+              ]}
+            >
+              <Text style={styles.rank}>
+                {getRankIcon(index)}
               </Text>
-              <Text style={styles.score}>
-                Score: {item.score}
-              </Text>
+
+              <View>
+                <Text style={styles.email}>
+                  {item.users?.email || 'User'}
+                </Text>
+                <Text style={styles.score}>
+                  Score: {item.score}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
+          )
+        }}
       />
     </View>
   )
@@ -77,7 +107,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#eef2ff'
   },
   center: {
     flex: 1,
@@ -95,8 +125,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 10
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 3
+  },
+  highlight: {
+    backgroundColor: '#c7d2fe'
   },
   rank: {
     fontSize: 22,

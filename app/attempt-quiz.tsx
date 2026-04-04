@@ -1,16 +1,44 @@
-import { useLocalSearchParams } from 'expo-router'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert
+} from 'react-native'
 import { useEffect, useState } from 'react'
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { supabase } from '../supabase'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 
 export default function AttemptQuiz() {
   const { quizId } = useLocalSearchParams()
+  const router = useRouter()
 
   const [questions, setQuestions] = useState([])
-  const [answers, setAnswers] = useState({})
-  const [timeLeft, setTimeLeft] = useState(60)
+  const [loading, setLoading] = useState(true)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
+  const [score, setScore] = useState(0)
 
-  // 🔥 FETCH QUESTIONS
+  // 🔥 Check if already attempted
+  const checkAttempt = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from('results')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('quiz_id', quizId)
+
+    if (data && data.length > 0) {
+      Alert.alert('Already Attempted', 'You have already attempted this quiz')
+      router.replace('/dashboard')
+    }
+  }
+
+  // 🔥 Fetch questions
   const fetchQuestions = async () => {
     const { data, error } = await supabase
       .from('questions')
@@ -22,84 +50,118 @@ export default function AttemptQuiz() {
     } else {
       setQuestions(data)
     }
+
+    setLoading(false)
   }
 
   useEffect(() => {
+    checkAttempt()
     fetchQuestions()
   }, [])
 
-  // 🔥 TIMER
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev === 0) {
-          clearInterval(timer)
-          handleSubmit()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
+  // 🔥 Handle next question
+  const handleNext = () => {
+    if (!selectedAnswer) {
+      Alert.alert('Select an option')
+      return
+    }
 
-    return () => clearInterval(timer)
-  }, [])
+    const currentQuestion = questions[currentIndex]
 
-  // 🔥 STORE ANSWERS
-  const handleSelect = (questionId, option) => {
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: option
-    }))
+    let updatedScore = score
+
+    if (selectedAnswer === currentQuestion.correct_answer) {
+      updatedScore = score + 1
+      setScore(updatedScore)
+    }
+
+    setSelectedAnswer(null)
+
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex(currentIndex + 1)
+    } else {
+      submitQuiz(updatedScore)
+    }
   }
 
-  // 🔥 SUBMIT QUIZ
-  const handleSubmit = () => {
-    let score = 0
+  // 🔥 Submit quiz (UPDATED NAVIGATION)
+  const submitQuiz = async (finalScore) => {
+    const { data: { user } } = await supabase.auth.getUser()
 
-    questions.forEach(q => {
-      if (answers[q.id] === q.correct_answer) {
-        score++
+    if (!user) return
+
+    const { error } = await supabase.from('results').insert([
+      {
+        user_id: user.id,
+        quiz_id: quizId,
+        score: finalScore
       }
-    })
+    ])
 
-    Alert.alert('Result', `Score: ${score}/${questions.length}`)
+    if (error) {
+      Alert.alert('Error', error.message)
+    } else {
+      // ✅ FINAL NAVIGATION FIX
+      router.replace({
+        pathname: '/result',
+        params: {
+          score: finalScore,
+          total: questions.length,
+          quizId: quizId   // 🔥 IMPORTANT
+        }
+      })
+    }
   }
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
+
+  if (questions.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text>No Questions Found</Text>
+      </View>
+    )
+  }
+
+  const currentQuestion = questions[currentIndex]
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.timer}>Time Left: {timeLeft}s</Text>
+    <View style={styles.container}>
+      <Text style={styles.questionCount}>
+        Question {currentIndex + 1} / {questions.length}
+      </Text>
 
-      {questions.map((q, index) => (
-        <View key={q.id} style={styles.card}>
-          <Text style={styles.question}>
-            {index + 1}. {q.question}
-          </Text>
+      <Text style={styles.question}>
+        {currentQuestion.question}
+      </Text>
 
-          {['A', 'B', 'C', 'D'].map((opt) => {
-            const isSelected = answers[q.id] === opt
-
-            return (
-              <TouchableOpacity
-                key={opt}
-                style={[
-                  styles.option,
-                  isSelected && { backgroundColor: '#cce5ff' }
-                ]}
-                onPress={() => handleSelect(q.id, opt)}
-              >
-                <Text>
-                  {opt}. {q[`option_${opt.toLowerCase()}`]}
-                </Text>
-              </TouchableOpacity>
-            )
-          })}
-        </View>
+      {/* 🔥 Options */}
+      {['option_a', 'option_b', 'option_c', 'option_d'].map((opt) => (
+        <TouchableOpacity
+          key={opt}
+          style={[
+            styles.option,
+            selectedAnswer === currentQuestion[opt] && styles.selected
+          ]}
+          onPress={() => setSelectedAnswer(currentQuestion[opt])}
+        >
+          <Text>{currentQuestion[opt]}</Text>
+        </TouchableOpacity>
       ))}
 
-      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit Quiz</Text>
+      {/* 🔥 Next / Submit Button */}
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
+        <Text style={styles.buttonText}>
+          {currentIndex + 1 === questions.length ? 'Submit' : 'Next'}
+        </Text>
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   )
 }
 
@@ -109,37 +171,40 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5'
   },
-  timer: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10
-  },
-  question: {
-    fontWeight: 'bold',
+  questionCount: {
+    fontSize: 16,
     marginBottom: 10
   },
-  option: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 8,
-    borderRadius: 6
+  question: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20
   },
-  submitBtn: {
+  option: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  selected: {
+    backgroundColor: '#d0ebff',
+    borderColor: '#007AFF'
+  },
+  button: {
+    marginTop: 20,
     backgroundColor: '#007AFF',
     padding: 15,
-    alignItems: 'center',
     borderRadius: 10,
-    marginTop: 20,
-    marginBottom: 40
+    alignItems: 'center'
   },
-  submitText: {
+  buttonText: {
     color: '#fff',
     fontWeight: 'bold'
   }

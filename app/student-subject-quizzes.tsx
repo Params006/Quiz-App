@@ -114,7 +114,12 @@ export default function StudentSubjectQuizzes() {
               <Text style={styles.quizTitle}>{item.title}</Text>
               <Text style={styles.quizInfo}>Duration: {item.duration} minutes</Text>
               {item.alreadyAttempted ? (
-                <Text style={styles.attemptedText}>Already Attempted</Text>
+                <TouchableOpacity
+                  style={styles.leaderboardButton}
+                  onPress={() => router.push({ pathname: '/leaderboard', params: { quizId: item.id } })}
+                >
+                  <Text style={styles.leaderboardButtonText}>View Leaderboard</Text>
+                </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.attemptButton}
@@ -173,6 +178,17 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     fontWeight: 'bold',
     marginTop: 10
+  },
+  leaderboardButton: {
+    backgroundColor: '#34C759',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  leaderboardButtonText: {
+    color: '#fff',
+    fontWeight: '600'
   },
   attemptButton: {
     backgroundColor: '#34C759',

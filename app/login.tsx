@@ -40,6 +40,7 @@ export default function Login() {
     const { error: userError } = await supabase.from('users').insert([
       {
         id: data.user.id,
+        email,
         role: selectedRole
       }
     ])

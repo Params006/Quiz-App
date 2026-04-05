@@ -103,8 +103,12 @@ export default function SubjectQuizzes() {
                 onPress={() => router.push({ pathname: '/questions', params: { quizId: item.id } })}
               >
                 <Text style={styles.addButtonText}>Questions</Text>
-              </TouchableOpacity>
-            </View>
+              </TouchableOpacity>              <TouchableOpacity
+                style={styles.leaderboardButton}
+                onPress={() => router.push({ pathname: '/leaderboard', params: { quizId: item.id } })}
+              >
+                <Text style={styles.leaderboardButtonText}>View Leaderboard</Text>
+              </TouchableOpacity>            </View>
           )}
         />
       )}
@@ -194,6 +198,17 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   addButtonText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+  leaderboardButton: {
+    backgroundColor: '#FF9500',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  leaderboardButtonText: {
     color: '#fff',
     fontWeight: '600'
   },

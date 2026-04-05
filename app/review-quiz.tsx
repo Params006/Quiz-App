@@ -30,7 +30,7 @@ export default function ReviewQuiz() {
 
     const { error } = await supabase
       .from('results')
-      .update({ score: finalScore, total_questions: parsedQuestions.length })
+      .update({ score: finalScore, total: parsedQuestions.length })
       .eq('user_id', user.id)
       .eq('quiz_id', quizId)
 

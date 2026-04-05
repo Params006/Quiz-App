@@ -122,7 +122,7 @@ export default function Questions() {
 
         <TouchableOpacity
           style={[styles.doneButton]}
-          onPress={() => router.push({ pathname: '/subject-quizzes', params: { subjectId } })}
+          onPress={() => router.back()}
         >
           <Text style={styles.doneButtonText}>Done</Text>
         </TouchableOpacity>

@@ -15,6 +15,11 @@ export default function JoinSubject() {
 
     const user = (await supabase.auth.getUser()).data.user
 
+    if (!user) {
+      Alert.alert('Error', 'User not logged in')
+      return
+    }
+
     const { data: subject, error: fetchError } = await supabase
       .from('subjects')
       .select('*')
@@ -38,7 +43,7 @@ export default function JoinSubject() {
     } else {
       Alert.alert('Success', 'Joined successfully')
       setCode('')
-      router.push('/dashboard')
+      router.replace('/student-dashboard')
     }
   }
 

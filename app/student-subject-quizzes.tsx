@@ -90,7 +90,7 @@ export default function StudentSubjectQuizzes() {
   }
 
   const handleAttempt = (quizId: string) => {
-    router.push({ pathname: '/attempt-quiz', params: { quizId } })
+    router.replace({ pathname: '/attempt-quiz', params: { quizId } })
   }
 
   return (

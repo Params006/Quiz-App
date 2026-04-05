@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { supabase } from '../supabase';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { supabase } from '../supabase';
 
 export default function Signup() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export default function Signup() {
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      <Text style={styles.link} onPress={() => router.push('/login')}>
+      <Text style={styles.link} onPress={() => router.replace('/login')}>
         Already have an account? Login
       </Text>
     </View>

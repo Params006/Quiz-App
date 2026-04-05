@@ -1,12 +1,12 @@
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import {
-  View,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert
+  View
 } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
 import { supabase } from '../supabase'
 
 export default function ReviewQuiz() {
@@ -28,13 +28,11 @@ export default function ReviewQuiz() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const { error } = await supabase.from('results').insert([
-      {
-        user_id: user.id,
-        quiz_id: quizId,
-        score: finalScore
-      }
-    ])
+    const { error } = await supabase
+      .from('results')
+      .update({ score: finalScore, total_questions: parsedQuestions.length })
+      .eq('user_id', user.id)
+      .eq('quiz_id', quizId)
 
     if (error) {
       Alert.alert('Error', error.message)

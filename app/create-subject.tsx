@@ -38,7 +38,7 @@ export default function CreateSubject() {
     } else {
       Alert.alert('Success', 'Subject created successfully')
       setName('')
-      router.replace('/dashboard')
+      router.replace('/teacher-dashboard')
     }
   }
 

@@ -24,6 +24,7 @@ export default function AttemptQuiz() {
   // ⏱️ GLOBAL TIMER
   const [totalTimeLeft, setTotalTimeLeft] = useState(120)
   const [timer, setTimer] = useState(null)
+  const [alreadyAttempted, setAlreadyAttempted] = useState(false)
 
   // 🔥 Check attempt
   const checkAttempt = async () => {
@@ -37,9 +38,12 @@ export default function AttemptQuiz() {
       .eq('quiz_id', quizId)
 
     if (data && data.length > 0) {
+      setAlreadyAttempted(true)
       Alert.alert('Already Attempted', 'You have already attempted this quiz')
       router.replace('/dashboard')
+      return true
     }
+    return false
   }
 
   // 🔥 Fetch questions
@@ -56,6 +60,26 @@ export default function AttemptQuiz() {
     }
 
     setLoading(false)
+  }
+
+  // 🔥 Mark as attempted
+  const markAttempted = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from('results')
+      .insert([
+        {
+          user_id: user.id,
+          quiz_id: quizId,
+          total: questions.length
+        }
+      ])
+
+    if (error && error.code !== '23505') { // ignore duplicate key error
+      console.error('Error marking attempt:', error)
+    }
   }
 
   // ⏱️ Start timer
@@ -75,9 +99,20 @@ export default function AttemptQuiz() {
   }
 
   useEffect(() => {
-    checkAttempt()
-    fetchQuestions()
+    const init = async () => {
+      const attempted = await checkAttempt()
+      if (!attempted) {
+        await fetchQuestions()
+      }
+    }
+    init()
   }, [])
+
+  useEffect(() => {
+    if (!alreadyAttempted && questions.length > 0) {
+      markAttempted()
+    }
+  }, [questions, alreadyAttempted])
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -143,7 +178,7 @@ export default function AttemptQuiz() {
   const goToReview = () => {
     if (timer) clearInterval(timer)
 
-    router.push({
+    router.replace({
       pathname: '/review-quiz',
       params: {
         quizId,

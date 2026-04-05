@@ -45,7 +45,7 @@ export default function CreateQuiz() {
 
       // 🔥 Navigate to Add Questions screen
       router.push({
-        pathname: '/add-questions',
+        pathname: '/questions',
         params: { quizId: data.id }
       })
     }

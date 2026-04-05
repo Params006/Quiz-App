@@ -75,11 +75,11 @@ export default function TeacherDashboard() {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.card}
-              onPress={() => router.push({ pathname: '/create-quiz', params: { subjectId: item.id } })}
+              onPress={() => router.push({ pathname: '/subject-quizzes', params: { subjectId: item.id } })}
             >
               <Text style={styles.subjectName}>{item.name}</Text>
               <Text style={styles.code}>Code: {item.join_code}</Text>
-              <Text style={styles.infoText}>Tap to create a quiz for this subject</Text>
+              <Text style={styles.infoText}>Tap to manage quizzes for this subject</Text>
             </TouchableOpacity>
           )}
         />

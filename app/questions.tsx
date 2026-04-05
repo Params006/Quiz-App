@@ -145,7 +145,7 @@ export default function Questions() {
             <TextInput placeholder="Option C" style={styles.input} value={optionC} onChangeText={setOptionC} />
             <TextInput placeholder="Option D" style={styles.input} value={optionD} onChangeText={setOptionD} />
             <TextInput
-              placeholder="Correct Answer (A/B/C/D)"
+              placeholder="Correct Answer"
               style={styles.input}
               value={correct}
               onChangeText={setCorrect}

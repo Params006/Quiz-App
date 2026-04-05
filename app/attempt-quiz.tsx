@@ -1,10 +1,8 @@
-import { AppState } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
-  StyleSheet,
+  Alert, AppState, StyleSheet,
   Text,
   TouchableOpacity,
   View
@@ -251,7 +249,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#eef2ff',
     padding: 20,
-    justifyContent: 'space-between'
+    gap: 10,
   },
   center: {
     flex: 1,

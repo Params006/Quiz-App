@@ -93,10 +93,14 @@ export default function StudentDashboard() {
           data={subjects}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push({ pathname: '/student-subject-quizzes', params: { subjectId: item.id } })}
+            >
               <Text style={styles.subjectName}>{item.name}</Text>
               <Text style={styles.code}>Code: {item.join_code}</Text>
-            </View>
+              <Text style={styles.infoText}>Tap to view quizzes</Text>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -152,8 +156,10 @@ const styles = StyleSheet.create({
   },
   code: {
     color: '#666'
-  },
-  emptyText: {
+  },  infoText: {
+    color: '#007AFF',
+    marginTop: 8
+  },  emptyText: {
     color: '#666',
     marginTop: 10
   }

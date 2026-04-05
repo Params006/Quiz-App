@@ -1,169 +1,59 @@
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { supabase } from '../supabase'
 
 export default function Dashboard() {
   const router = useRouter()
-  const [subjects, setSubjects] = useState([])
-  const [role, setRole] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchData()
+    const redirectByRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.replace('/login')
+        return
+      }
 
-    const interval = setInterval(() => {
-      fetchData()
-    }, 5000)
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single()
 
-    return () => clearInterval(interval)
-  }, [])
+      if (error || !userData?.role) {
+        router.replace('/login')
+        return
+      }
 
-  const fetchData = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    // 🔥 Get role
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    setRole(userData?.role)
-
-    // 🔹 Created subjects
-    const { data: createdSubjects } = await supabase
-      .from('subjects')
-      .select('*')
-      .eq('teacher_id', user.id)
-
-    // 🔹 Joined subjects
-    const { data: enrollments } = await supabase
-      .from('enrollments')
-      .select('subject_id')
-
-    let joinedSubjects = []
-
-    if (enrollments) {
-      const ids = enrollments.map(e => e.subject_id)
-
-      const { data } = await supabase
-        .from('subjects')
-        .select('*')
-        .in('id', ids)
-
-      joinedSubjects = data || []
+      if (userData.role === 'teacher') {
+        router.replace('/teacher-dashboard')
+      } else {
+        router.replace('/student-dashboard')
+      }
     }
 
-    setSubjects([...(createdSubjects || []), ...joinedSubjects])
-  }
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.replace('/login')
-  }
+    redirectByRole()
+  }, [])
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Dashboard</Text>
-
-      {/* 🔥 Role-based buttons */}
-      {role === 'teacher' && (
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={() => router.push('/create-subject')}
-        >
-          <Text style={styles.buttonText}>Create Subject</Text>
-        </TouchableOpacity>
-      )}
-
-      {role === 'student' && (
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: '#34C759' }]}
-          onPress={() => router.push('/join-subject')}
-        >
-          <Text style={styles.buttonText}>Join Subject</Text>
-        </TouchableOpacity>
-      )}
-
-      <Text style={styles.subtitle}>Your Subjects</Text>
-
-      <FlatList
-        data={subjects}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => {
-              if (role === 'teacher') {
-                router.push({
-                  pathname: '/create-quiz',
-                  params: { subjectId: item.id }
-                })
-              }
-            }}
-          >
-            <Text style={styles.subjectName}>{item.name}</Text>
-            <Text style={styles.code}>Code: {item.join_code}</Text>
-
-            {role === 'teacher' && (
-              <Text style={{ color: '#007AFF', marginTop: 5 }}>
-                Tap to create quiz →
-              </Text>
-            )}
-          </TouchableOpacity>
-        )}
-      />
-
-      {/* 🔥 Logout */}
-      <TouchableOpacity 
-        style={[styles.button, { backgroundColor: '#FF3B30' }]}
-        onPress={handleLogout}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Redirecting...</Text>
+      <ActivityIndicator size="large" />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: '#f5f5f5' 
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5'
   },
-  title: { 
-    fontSize: 28, 
-    fontWeight: 'bold', 
-    marginBottom: 20 
-  },
-  subtitle: { 
-    fontSize: 20, 
-    marginVertical: 10 
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignItems: 'center'
-  },
-  buttonText: { 
-    color: '#fff', 
-    fontWeight: '600' 
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 3
-  },
-  subjectName: { 
-    fontWeight: 'bold', 
-    fontSize: 16 
-  },
-  code: { 
-    color: '#666' 
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20
   }
 })

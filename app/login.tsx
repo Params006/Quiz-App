@@ -64,9 +64,9 @@ export default function Login() {
 
     // Redirect based on role
     if (selectedRole === 'teacher') {
-      router.replace('/dashboard')
+      router.replace('/teacher-dashboard')
     } else {
-      router.replace('/join-subject')
+      router.replace('/student-dashboard')
     }
 
     setLoading(false)
@@ -106,9 +106,9 @@ export default function Login() {
 
     // Redirect based on role
     if (userData.role === 'teacher') {
-      router.replace('/dashboard')
+      router.replace('/teacher-dashboard')
     } else {
-      router.replace('/join-subject')
+      router.replace('/student-dashboard')
     }
 
     setLoading(false)

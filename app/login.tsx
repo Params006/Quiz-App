@@ -1,12 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
-import { useState } from 'react'
-import { supabase } from '../supabase'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { supabase } from '../supabase'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [selectedRole, setSelectedRole] = useState('teacher')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSignup = async () => {
@@ -15,6 +16,8 @@ export default function Login() {
       return
     }
 
+    setLoading(true)
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -22,12 +25,14 @@ export default function Login() {
 
     if (error) {
       Alert.alert('Error', error.message)
+      setLoading(false)
       return
     }
 
     // ⚠️ Check if user exists
     if (!data?.user) {
       Alert.alert('Error', 'Signup failed. Try again.')
+      setLoading(false)
       return
     }
 
@@ -41,10 +46,30 @@ export default function Login() {
 
     if (userError) {
       Alert.alert('Error', userError.message)
+      setLoading(false)
       return
     }
 
-    Alert.alert('Success', 'Account created! Now login.')
+    // Auto-login after signup
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (loginError) {
+      Alert.alert('Error', loginError.message)
+      setLoading(false)
+      return
+    }
+
+    // Redirect based on role
+    if (selectedRole === 'teacher') {
+      router.replace('/dashboard')
+    } else {
+      router.replace('/join-subject')
+    }
+
+    setLoading(false)
   }
 
   const handleLogin = async () => {
@@ -53,16 +78,40 @@ export default function Login() {
       return
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    setLoading(true)
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
     if (error) {
       Alert.alert('Error', error.message)
-    } else {
-      router.replace('/dashboard')
+      setLoading(false)
+      return
     }
+
+    // Fetch user role
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', data.user.id)
+      .single()
+
+    if (userError) {
+      Alert.alert('Error', 'Failed to fetch user role')
+      setLoading(false)
+      return
+    }
+
+    // Redirect based on role
+    if (userData.role === 'teacher') {
+      router.replace('/dashboard')
+    } else {
+      router.replace('/join-subject')
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -102,15 +151,16 @@ export default function Login() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
         style={[styles.button, { backgroundColor: '#34C759' }]} 
         onPress={handleSignup}
+        disabled={loading}
       >
-        <Text style={styles.buttonText}>Signup</Text>
+        <Text style={styles.buttonText}>{loading ? 'Signing up...' : 'Signup'}</Text>
       </TouchableOpacity>
     </View>
   )

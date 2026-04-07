@@ -1,6 +1,6 @@
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
-import { useEffect } from 'react'
 import { useRouter } from 'expo-router'
+import { useEffect } from 'react'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { supabase } from '../supabase'
 
 export default function Index() {
@@ -27,7 +27,7 @@ export default function Index() {
     <View style={styles.container}>
       
       {/* App Title */}
-      <Text style={styles.title}>Quiz App</Text>
+      <Text style={styles.title}>Quiz IT</Text>
 
       {/* Subtitle */}
       <Text style={styles.subtitle}>Loading your experience...</Text>

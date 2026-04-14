@@ -22,8 +22,8 @@ export default function AttemptQuiz() {
   const [violations, setViolations] = useState(0)
 
   // ⏱️ GLOBAL TIMER
-  const [totalTimeLeft, setTotalTimeLeft] = useState(120)
-  const [timer, setTimer] = useState(null)
+  const [totalTimeLeft, setTotalTimeLeft] = useState(0)
+  const [timer, setTimer] = useState<any>(null)
   const [alreadyAttempted, setAlreadyAttempted] = useState(false)
 
   // 🔥 Check attempt
@@ -46,8 +46,23 @@ export default function AttemptQuiz() {
     return false
   }
 
-  // 🔥 Fetch questions
+  // 🔥 Fetch quiz and questions
   const fetchQuestions = async () => {
+    const { data: quizData, error: quizError } = await supabase
+      .from('quizzes')
+      .select('duration')
+      .eq('id', quizId)
+      .single()
+
+    if (quizError || !quizData) {
+      Alert.alert('Error', quizError?.message ?? 'Quiz not found')
+      setLoading(false)
+      return
+    }
+
+    const durationMinutes = Number(quizData.duration) || 2
+    setTotalTimeLeft(durationMinutes * 60)
+
     const { data, error } = await supabase
       .from('questions')
       .select('*')
@@ -115,10 +130,18 @@ export default function AttemptQuiz() {
   }, [questions, alreadyAttempted])
 
   useEffect(() => {
-    if (questions.length > 0) {
+    if (questions.length > 0 && !timer) {
       startQuizTimer()
     }
-  }, [questions])
+  }, [questions, timer])
+
+  useEffect(() => {
+    return () => {
+      if (timer) {
+        clearInterval(timer)
+      }
+    }
+  }, [timer])
 
   useEffect(() => {
   const subscription = AppState.addEventListener('change', nextAppState => {

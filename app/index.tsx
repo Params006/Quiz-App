@@ -30,7 +30,7 @@ export default function Index() {
       <Text style={styles.title}>Quiz IT</Text>
 
       {/* Subtitle */}
-      <Text style={styles.subtitle}>Challenge your mind and level up with every quiz.</Text>
+      <Text style={styles.subtitle}>Loading your experience...</Text>
 
       {/* Loader */}
       <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />

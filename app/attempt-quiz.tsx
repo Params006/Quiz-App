@@ -92,18 +92,18 @@ export default function AttemptQuiz() {
         }
       ])
 
-    if (error && error.code !== '23505') { // ignore duplicate key error
+    if (error && error.code !== '23505') { //ignore duplicate key error
       console.error('Error marking attempt:', error)
     }
   }
 
-  // ⏱️ Start timer
+  // Start timer
   const startQuizTimer = () => {
     const newTimer = setInterval(() => {
       setTotalTimeLeft((prev) => {
         if (prev === 1) {
           clearInterval(newTimer)
-          goToReview() // ✅ go to review instead of submit
+          goToReview() //go to review instead of submit
           return 0
         }
         return prev - 1
@@ -148,7 +148,7 @@ export default function AttemptQuiz() {
 
     if (appState === 'active' && nextAppState !== 'active') {
 
-      // 🚨 User left app
+      // User left app
       if (violations >= 2) {
         Alert.alert(
           'Auto Submit',
@@ -190,14 +190,14 @@ export default function AttemptQuiz() {
     }
   }
 
-  // 👉 PREVIOUS
+  // PREVIOUS
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1)
     }
   }
 
-  // ✅ GO TO REVIEW
+  // GO TO REVIEW
   const goToReview = () => {
     if (timer) clearInterval(timer)
 
@@ -211,7 +211,7 @@ export default function AttemptQuiz() {
     })
   }
 
-  // 🔥 Loading
+  // Loading
   if (loading) {
     return (
       <View style={styles.center}>
@@ -220,7 +220,7 @@ export default function AttemptQuiz() {
     )
   }
 
-  // 🔥 No questions
+  // No questions
   if (questions.length === 0) {
     return (
       <View style={styles.center}>

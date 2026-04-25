@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   correct: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#34C759',
+    color: '#4F46E5',
     marginTop: 5
   },
   emptyText: {
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     right: 20
   },
   addButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#4F46E5',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   doneButton: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#4F46E5',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center'
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   modalButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#4F46E5',
     padding: 14,
     borderRadius: 10,
     flex: 1,

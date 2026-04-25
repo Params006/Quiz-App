@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function CreateQuiz() {
@@ -16,7 +23,6 @@ export default function CreateQuiz() {
       return
     }
 
-    // 🔥 Get logged in user
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -24,7 +30,6 @@ export default function CreateQuiz() {
       return
     }
 
-    // 🔥 Insert quiz
     const { data, error } = await supabase
       .from('quizzes')
       .insert([
@@ -43,7 +48,6 @@ export default function CreateQuiz() {
     } else {
       Alert.alert('Success', 'Quiz created!')
 
-      // 🔥 Navigate to Add Questions screen
       router.push({
         pathname: '/questions',
         params: { quizId: data.id }
@@ -55,24 +59,30 @@ export default function CreateQuiz() {
     <View style={styles.container}>
       <Text style={styles.title}>Create Quiz</Text>
 
-      <TextInput
-        placeholder="Enter Quiz Title"
-        style={styles.input}
-        value={title}
-        onChangeText={setTitle}
-      />
+      <View style={styles.card}>
 
-      <TextInput
-        placeholder="Enter Duration (minutes)"
-        keyboardType="numeric"
-        style={styles.input}
-        value={duration}
-        onChangeText={setDuration}
-      />
+        <Text style={styles.label}>Quiz Title</Text>
+        <TextInput
+          placeholder="Enter Quiz Title"
+          style={styles.input}
+          value={title}
+          onChangeText={setTitle}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleCreateQuiz}>
-        <Text style={styles.buttonText}>Create Quiz</Text>
-      </TouchableOpacity>
+        <Text style={styles.label}>Duration (in minutes)</Text>
+        <TextInput
+          placeholder="Enter Duration"
+          keyboardType="numeric"
+          style={styles.input}
+          value={duration}
+          onChangeText={setDuration}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleCreateQuiz}>
+          <Text style={styles.buttonText}>Create Quiz</Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   )
 }
@@ -80,32 +90,52 @@ export default function CreateQuiz() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    justifyContent: 'center'
   },
+
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: '#111827',
+    marginBottom: 20
   },
+
+  card: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 16,
+    elevation: 4
+  },
+
+  label: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 6
+  },
+
   input: {
     backgroundColor: '#fff',
     padding: 14,
     borderRadius: 10,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#ccc'
+    borderColor: '#E5E7EB',
+    color: '#111827'
   },
+
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#4F46E5',
     padding: 15,
-    borderRadius: 10,
-    alignItems: 'center'
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10
   },
+
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: '600'
   }
 })

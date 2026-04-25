@@ -1,6 +1,14 @@
 import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function StudentDashboard() {
@@ -76,36 +84,50 @@ export default function StudentDashboard() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Student Dashboard</Text>
+      <Text style={styles.title}>🎓 Student Dashboard</Text>
 
+      {/* JOIN BUTTON */}
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#34C759' }]}
+        style={styles.joinButton}
         onPress={() => router.push('/join-subject')}
       >
-        <Text style={styles.buttonText}>Join Subject</Text>
+        <Text style={styles.buttonText}>+ Join Subject</Text>
       </TouchableOpacity>
 
-      <Text style={styles.subtitle}>Enrolled Subjects</Text>
+      <Text style={styles.subtitle}>Your Subjects</Text>
+
       {subjects.length === 0 ? (
-        <Text style={styles.emptyText}>You are not enrolled in any subjects yet.</Text>
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyText}>No subjects joined yet</Text>
+          <Text style={styles.emptySubText}>
+            Tap "Join Subject" to get started
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={subjects}
           keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.card}
-              onPress={() => router.push({ pathname: '/student-subject-quizzes', params: { subjectId: item.id } })}
+              onPress={() =>
+                router.push({
+                  pathname: '/student-subject-quizzes',
+                  params: { subjectId: item.id }
+                })
+              }
             >
               <Text style={styles.subjectName}>{item.name}</Text>
               <Text style={styles.code}>Code: {item.join_code}</Text>
-              <Text style={styles.infoText}>Tap to view quizzes</Text>
+              <Text style={styles.infoText}>View Quizzes →</Text>
             </TouchableOpacity>
           )}
         />
       )}
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: '#FF3B30' }]} onPress={handleLogout}>
+      {/* LOGOUT */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -116,51 +138,91 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#F9FAFB'
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
+
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#111827',
     marginBottom: 20
   },
+
   subtitle: {
-    fontSize: 20,
-    marginVertical: 10
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 10
   },
-  button: {
-    backgroundColor: '#007AFF',
+
+  joinButton: {
+    backgroundColor: '#4F46E5',
     padding: 14,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignItems: 'center'
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 20,
+    elevation: 2
   },
+
+  logoutButton: {
+    backgroundColor: '#EF4444',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10
+  },
+
   buttonText: {
     color: '#fff',
     fontWeight: '600'
   },
+
   card: {
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
     elevation: 3
   },
+
   subjectName: {
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 17,
+    color: '#111827'
   },
+
   code: {
-    color: '#666'
-  },  infoText: {
-    color: '#007AFF',
-    marginTop: 8
-  },  emptyText: {
-    color: '#666',
-    marginTop: 10
+    color: '#6B7280',
+    marginTop: 4
+  },
+
+  infoText: {
+    color: '#4F46E5',
+    marginTop: 10,
+    fontWeight: '500'
+  },
+
+  emptyBox: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginTop: 20
+  },
+
+  emptyText: {
+    color: '#111827',
+    fontSize: 16,
+    fontWeight: '600'
+  },
+
+  emptySubText: {
+    color: '#6B7280',
+    marginTop: 5
   }
 })

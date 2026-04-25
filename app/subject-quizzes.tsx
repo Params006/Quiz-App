@@ -1,6 +1,15 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function SubjectQuizzes() {
@@ -43,7 +52,6 @@ export default function SubjectQuizzes() {
       return
     }
 
-    // Check for duplicate title in this subject
     const { data: existing } = await supabase
       .from('quizzes')
       .select('id')
@@ -74,7 +82,7 @@ export default function SubjectQuizzes() {
       setTitle('')
       setDuration('')
       setModalVisible(false)
-      loadQuizzes() // Refresh list
+      loadQuizzes()
     }
   }
 
@@ -82,12 +90,15 @@ export default function SubjectQuizzes() {
     <View style={styles.container}>
       <Text style={styles.title}>Quizzes</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonText}>Create New Quiz</Text>
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.primaryButtonText}>+ Create New Quiz</Text>
       </TouchableOpacity>
 
       {loading ? (
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       ) : quizzes.length === 0 ? (
         <Text style={styles.emptyText}>No quizzes created yet.</Text>
       ) : (
@@ -97,22 +108,39 @@ export default function SubjectQuizzes() {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.quizTitle}>{item.title}</Text>
-              <Text style={styles.quizInfo}>Duration: {item.duration} minutes</Text>
+              <Text style={styles.quizInfo}>
+                ⏱ Duration: {item.duration} min
+              </Text>
+
               <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => router.push({ pathname: '/questions', params: { quizId: item.id } })}
+                style={styles.successButton}
+                onPress={() =>
+                  router.push({
+                    pathname: '/questions',
+                    params: { quizId: item.id }
+                  })
+                }
               >
-                <Text style={styles.addButtonText}>Questions</Text>
-              </TouchableOpacity>              <TouchableOpacity
-                style={styles.leaderboardButton}
-                onPress={() => router.push({ pathname: '/leaderboard', params: { quizId: item.id } })}
+                <Text style={styles.buttonText}>Manage Questions</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={() =>
+                  router.push({
+                    pathname: '/leaderboard',
+                    params: { quizId: item.id }
+                  })
+                }
               >
-                <Text style={styles.leaderboardButtonText}>View Leaderboard</Text>
-              </TouchableOpacity>            </View>
+                <Text style={styles.buttonText}>View Leaderboard</Text>
+              </TouchableOpacity>
+            </View>
           )}
         />
       )}
 
+      {/* MODAL */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -134,11 +162,18 @@ export default function SubjectQuizzes() {
             />
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#ccc' }]} onPress={() => setModalVisible(false)}>
-                <Text>Cancel</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={{ color: '#000' }}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={handleCreateQuiz}>
-                <Text style={styles.buttonText}>Create</Text>
+
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={handleCreateQuiz}
+              >
+                <Text style={styles.primaryButtonText}>Create</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -152,102 +187,121 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#EEF2FF'
   },
+
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 14,
-    borderRadius: 10,
     marginBottom: 20,
+    color: '#111'
+  },
+
+  loadingText: {
+    textAlign: 'center',
+    color: '#666'
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#6B7280'
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 15,
+    elevation: 4
+  },
+
+  quizTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111'
+  },
+
+  quizInfo: {
+    color: '#6B7280',
+    marginTop: 5
+  },
+
+  primaryButton: {
+    backgroundColor: '#4F46E5',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 15
+  },
+
+  primaryButtonText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+
+  successButton: {
+    backgroundColor: '#4F46E5',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 12,
     alignItems: 'center'
   },
+
+  secondaryButton: {
+    backgroundColor: '#0bf5d6',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: 'center'
+  },
+
   buttonText: {
     color: '#fff',
     fontWeight: '600'
   },
-  emptyText: {
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 20
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 3
-  },
-  quizTitle: {
-    fontWeight: 'bold',
-    fontSize: 16
-  },
-  quizInfo: {
-    color: '#666',
-    marginTop: 5
-  },
-  addButton: {
-    backgroundColor: '#34C759',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center'
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: '600'
-  },
-  leaderboardButton: {
-    backgroundColor: '#FF9500',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center'
-  },
-  leaderboardButtonText: {
-    color: '#fff',
-    fontWeight: '600'
-  },
+
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    backgroundColor: 'rgba(0,0,0,0.4)'
   },
+
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    width: '80%'
+    borderRadius: 16,
+    width: '85%'
   },
+
   modalTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center'
   },
+
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#F9FAFB',
     padding: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 15,
-    backgroundColor: '#fff'
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    color: '#000'
   },
+
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    gap: 10
   },
-  modalButton: {
-    backgroundColor: '#007AFF',
-    padding: 14,
-    borderRadius: 10,
+
+  cancelButton: {
     flex: 1,
-    marginHorizontal: 5,
+    backgroundColor: '#E5E7EB',
+    padding: 14,
+    borderRadius: 12,
     alignItems: 'center'
   }
 })

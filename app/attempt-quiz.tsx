@@ -301,85 +301,113 @@ export default function AttemptQuiz() {
   )
 }
 
-// 🎨 STYLES
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eef2ff',
-    padding: 20,
-    gap: 10,
+    backgroundColor: '#F9FAFB',
+    padding: 20
   },
+
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
   },
+
+  // 🔥 TOP BAR
   timer: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#ef4444',
+    color: '#EF4444',
     textAlign: 'right'
   },
+
   progressBarContainer: {
-    height: 10,
-    backgroundColor: '#e5e7eb',
+    height: 8,
+    backgroundColor: '#E5E7EB',
     borderRadius: 10,
     overflow: 'hidden',
-    marginVertical: 10
+    marginTop: 10
   },
+
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#4f46e5'
+    backgroundColor: '#4F46E5'
   },
+
   progressText: {
     textAlign: 'right',
-    color: '#555',
-    marginBottom: 10
+    color: '#6B7280',
+    marginBottom: 15,
+    marginTop: 5,
+    fontSize: 13
   },
+
+  // 🔥 CARD
   card: {
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 16,
     padding: 20,
-    elevation: 5
+    elevation: 4
   },
+
   questionCount: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 13,
+    color: '#6B7280',
     marginBottom: 10
   },
+
   question: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#111827',
     marginBottom: 20
   },
+
+  // 🔥 OPTIONS
   option: {
     padding: 15,
     borderRadius: 12,
     marginBottom: 12,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
-    borderColor: '#ddd'
+    borderColor: '#E5E7EB'
   },
+
   selected: {
-    backgroundColor: '#4f46e5'
+    backgroundColor: '#4F46E5',
+    borderColor: '#4F46E5'
   },
+
   optionText: {
     fontSize: 16,
-    color: '#000'
+    color: '#111827'
   },
+
+  // 👉 Selected text override (IMPORTANT)
+  selectedText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+
+  // 🔥 BUTTONS
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginTop: 20
   },
+
   button: {
-    backgroundColor: '#4f46e5',
+    backgroundColor: '#4F46E5',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
-    width: '48%'
+    width: '48%',
+    elevation: 2
   },
+
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: '600'
   }
 })

@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function StudentSubjectQuizzes() {
@@ -20,7 +27,6 @@ export default function StudentSubjectQuizzes() {
       return
     }
 
-    // Check role
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
@@ -32,7 +38,6 @@ export default function StudentSubjectQuizzes() {
       return
     }
 
-    // Check enrollment
     const { data: enrollment, error: enrollError } = await supabase
       .from('enrollments')
       .select('id')
@@ -46,7 +51,6 @@ export default function StudentSubjectQuizzes() {
       return
     }
 
-    // Fetch quizzes with question count
     const { data: quizData, error: quizError } = await supabase
       .from('quizzes')
       .select(`
@@ -65,13 +69,11 @@ export default function StudentSubjectQuizzes() {
       return
     }
 
-    // Filter quizzes with at least 1 question and check attempts
     const availableQuizzes = []
     for (const quiz of quizData || []) {
       const questionCount = quiz.questions?.[0]?.count || 0
       if (questionCount === 0) continue
 
-      // Check if already attempted
       const { data: attempt } = await supabase
         .from('results')
         .select('id')
@@ -97,14 +99,19 @@ export default function StudentSubjectQuizzes() {
     <View style={styles.container}>
       <Text style={styles.title}>Available Quizzes</Text>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/student-dashboard')}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.replace('/student-dashboard')}
+      >
         <Text style={styles.backButtonText}>← Back to Subjects</Text>
       </TouchableOpacity>
 
       {loading ? (
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       ) : quizzes.length === 0 ? (
-        <Text style={styles.emptyText}>No quizzes available for this subject.</Text>
+        <Text style={styles.emptyText}>
+          No quizzes available for this subject.
+        </Text>
       ) : (
         <FlatList
           data={quizzes}
@@ -112,20 +119,33 @@ export default function StudentSubjectQuizzes() {
           renderItem={({ item }) => (
             <View style={styles.card}>
               <Text style={styles.quizTitle}>{item.title}</Text>
-              <Text style={styles.quizInfo}>Duration: {item.duration} minutes</Text>
+
+              <Text style={styles.quizInfo}>
+                ⏱ {item.duration} minutes
+              </Text>
+
               {item.alreadyAttempted ? (
                 <TouchableOpacity
-                  style={styles.leaderboardButton}
-                  onPress={() => router.push({ pathname: '/leaderboard', params: { quizId: item.id } })}
+                  style={styles.secondaryButton}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/leaderboard',
+                      params: { quizId: item.id }
+                    })
+                  }
                 >
-                  <Text style={styles.leaderboardButtonText}>View Leaderboard</Text>
+                  <Text style={styles.buttonText}>
+                    View Leaderboard
+                  </Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
-                  style={styles.attemptButton}
+                  style={styles.primaryButton}
                   onPress={() => handleAttempt(item.id)}
                 >
-                  <Text style={styles.attemptButtonText}>Attempt Quiz</Text>
+                  <Text style={styles.buttonText}>
+                    Start Quiz 🚀
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -140,64 +160,73 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#EEF2FF'
   },
+
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20
+    marginBottom: 10,
+    color: '#111'
   },
+
   backButton: {
     marginBottom: 20
   },
+
   backButtonText: {
-    color: '#007AFF',
-    fontSize: 16
+    color: '#4F46E5',
+    fontSize: 15,
+    fontWeight: '500'
   },
-  emptyText: {
-    color: '#666',
+
+  loadingText: {
     textAlign: 'center',
-    marginTop: 20
+    color: '#666'
   },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 30,
+    color: '#6B7280'
+  },
+
   card: {
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    elevation: 3
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 15,
+    elevation: 4
   },
+
   quizTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 16
+    color: '#111'
   },
+
   quizInfo: {
-    color: '#666',
+    color: '#6B7280',
     marginTop: 5
   },
-  attemptedText: {
-    color: '#FF3B30',
-    fontWeight: 'bold',
-    marginTop: 10
-  },
-  leaderboardButton: {
-    backgroundColor: '#34C759',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
+
+  primaryButton: {
+    backgroundColor: '#4F46E5',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 12,
     alignItems: 'center'
   },
-  leaderboardButtonText: {
-    color: '#fff',
-    fontWeight: '600'
-  },
-  attemptButton: {
-    backgroundColor: '#34C759',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
+
+  secondaryButton: {
+    backgroundColor: '#4F46E5',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 12,
     alignItems: 'center'
   },
-  attemptButtonText: {
+
+  buttonText: {
     color: '#fff',
     fontWeight: '600'
   }

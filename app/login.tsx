@@ -1,77 +1,22 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [selectedRole, setSelectedRole] = useState('teacher')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
   const router = useRouter()
-
-  const handleSignup = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter email and password')
-      return
-    }
-
-    setLoading(true)
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (error) {
-      Alert.alert('Error', error.message)
-      setLoading(false)
-      return
-    }
-
-    // ⚠️ Check if user exists
-    if (!data?.user) {
-      Alert.alert('Error', 'Signup failed. Try again.')
-      setLoading(false)
-      return
-    }
-
-    // 🔥 Insert into users table
-    const { error: userError } = await supabase.from('users').insert([
-      {
-        id: data.user.id,
-        email,
-        role: selectedRole
-      }
-    ])
-
-    if (userError) {
-      Alert.alert('Error', userError.message)
-      setLoading(false)
-      return
-    }
-
-    // Auto-login after signup
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (loginError) {
-      Alert.alert('Error', loginError.message)
-      setLoading(false)
-      return
-    }
-
-    // Redirect based on role
-    if (selectedRole === 'teacher') {
-      router.replace('/teacher-dashboard')
-    } else {
-      router.replace('/student-dashboard')
-    }
-
-    setLoading(false)
-  }
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -92,7 +37,6 @@ export default function Login() {
       return
     }
 
-    // Fetch user role
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
@@ -105,7 +49,6 @@ export default function Login() {
       return
     }
 
-    // Redirect based on role
     if (userData.role === 'teacher') {
       router.replace('/teacher-dashboard')
     } else {
@@ -117,51 +60,49 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login / Signup</Text>
+      <Text style={styles.title}>Welcome Back 👋</Text>
+      <Text style={styles.subtitle}>Login to continue</Text>
 
+      {/* EMAIL */}
       <TextInput
-        placeholder="Email"
+        placeholder="Enter your email"
+        placeholderTextColor="#9CA3AF"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
       />
 
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-      />
+      {/* PASSWORD */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Enter your password"
+          placeholderTextColor="#9CA3AF"
+          secureTextEntry={!showPassword}
+          style={styles.passwordInput}
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      {/* 🔥 Role Selection */}
-      <View style={styles.roleContainer}>
-        <TouchableOpacity 
-          style={[styles.roleButton, selectedRole === 'teacher' && styles.selected]}
-          onPress={() => setSelectedRole('teacher')}
-        >
-          <Text>Teacher</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.roleButton, selectedRole === 'student' && styles.selected]}
-          onPress={() => setSelectedRole('student')}
-        >
-          <Text>Student</Text>
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Text style={styles.showText}>
+            {showPassword ? 'Hide' : 'Show'}
+          </Text>
         </TouchableOpacity>
       </View>
 
+      {/* LOGIN BUTTON */}
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+        <Text style={styles.buttonText}>
+          {loading ? 'Logging in...' : 'Login'}
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.button, { backgroundColor: '#34C759' }]} 
-        onPress={handleSignup}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>{loading ? 'Signing up...' : 'Signup'}</Text>
+      {/* SIGNUP LINK */}
+      <TouchableOpacity onPress={() => router.push('/signup')}>
+        <Text style={styles.link}>
+          Don't have an account? Signup
+        </Text>
       </TouchableOpacity>
     </View>
   )
@@ -172,44 +113,64 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#F9FAFB'
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 30
+    color: '#111827'
+  },
+  subtitle: {
+    textAlign: 'center',
+    color: '#6B7280',
+    marginBottom: 30,
+    marginTop: 5
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#E5E7EB',
     padding: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 15,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    color: '#111827'
   },
-  roleContainer: {
+  passwordContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
     marginBottom: 20
   },
-  roleButton: {
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 8
+  passwordInput: {
+    flex: 1,
+    padding: 14,
+    color: '#111827'
   },
-  selected: {
-    backgroundColor: '#ddd'
+  showText: {
+    color: '#4F46E5',
+    fontWeight: '600'
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 10,
-    alignItems: 'center'
+    backgroundColor: '#4F46E5',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 3
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '600'
+    fontWeight: '600',
+    fontSize: 16
+  },
+  link: {
+    textAlign: 'center',
+    color: '#4F46E5',
+    marginTop: 20,
+    fontWeight: '500'
   }
 })

@@ -10,7 +10,6 @@ export default function Result() {
   const { score, total, quizId } = useLocalSearchParams()
   const router = useRouter()
 
-  // 🔥 Convert to number (VERY IMPORTANT)
   const finalScore = Number(score)
   const totalQuestions = Number(total)
 
@@ -24,45 +23,55 @@ export default function Result() {
     return 'Keep Practicing 💪'
   }
 
+  // 🔥 Dynamic color
+  const getColor = () => {
+    if (percentage >= 70) return '#22C55E' // green
+    if (percentage >= 40) return '#F59E0B' // yellow
+    return '#EF4444' // red
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quiz Result</Text>
+      <View style={styles.card}>
+        
+        <Text style={styles.title}>🎉 Quiz Result</Text>
 
-      {/* 🔥 Score */}
-      <Text style={styles.score}>
-        {finalScore} / {totalQuestions}
-      </Text>
+        {/* SCORE */}
+        <Text style={[styles.score, { color: getColor() }]}>
+          {finalScore} / {totalQuestions}
+        </Text>
 
-      {/* 🔥 Percentage */}
-      <Text style={styles.percentage}>
-        {percentage}%
-      </Text>
+        {/* PERCENTAGE */}
+        <Text style={styles.percentage}>
+          {percentage}%
+        </Text>
 
-      {/* 🔥 Message */}
-      <Text style={styles.message}>
-        {getMessage()}
-      </Text>
+        {/* MESSAGE */}
+        <Text style={styles.message}>
+          {getMessage()}
+        </Text>
 
-      {/* 🔥 Go to Dashboard */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.replace('/dashboard')}
-      >
-        <Text style={styles.buttonText}>Go to Dashboard</Text>
-      </TouchableOpacity>
+        {/* BUTTONS */}
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => router.replace('/dashboard')}
+        >
+          <Text style={styles.buttonText}>Go to Dashboard</Text>
+        </TouchableOpacity>
 
-      {/* 🔥 View Leaderboard */}
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#34C759' }]}
-        onPress={() =>
-          router.push({
-            pathname: '/leaderboard',
-            params: { quizId }
-          })
-        }
-      >
-        <Text style={styles.buttonText}>View Leaderboard</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() =>
+            router.push({
+              pathname: '/leaderboard',
+              params: { quizId }
+            })
+          }
+        >
+          <Text style={styles.buttonText}>View Leaderboard</Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   )
 }
@@ -70,39 +79,67 @@ export default function Result() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F9FAFB',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5'
+    padding: 20
   },
+
+  card: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    elevation: 5
+  },
+
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#111827',
     marginBottom: 20
   },
+
   score: {
     fontSize: 42,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 5
   },
+
   percentage: {
-    fontSize: 24,
+    fontSize: 20,
+    color: '#6B7280',
     marginBottom: 10
   },
+
   message: {
-    fontSize: 20,
-    marginBottom: 30
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 25,
+    textAlign: 'center'
   },
-  button: {
-    backgroundColor: '#007AFF',
+
+  primaryButton: {
+    width: '100%',
+    backgroundColor: '#4F46E5',
     padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
-    width: '80%',
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 10
+  },
+
+  secondaryButton: {
+    width: '100%',
+    backgroundColor: '#4F46E5',
+    padding: 15,
+    borderRadius: 12,
     alignItems: 'center'
   },
+
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: '600'
   }
 })

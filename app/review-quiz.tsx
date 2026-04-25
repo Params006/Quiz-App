@@ -30,7 +30,10 @@ export default function ReviewQuiz() {
 
     const { error } = await supabase
       .from('results')
-      .update({ score: finalScore, total: parsedQuestions.length })
+      .update({
+        score: finalScore,
+        total: parsedQuestions.length
+      })
       .eq('user_id', user.id)
       .eq('quiz_id', quizId)
 
@@ -48,11 +51,21 @@ export default function ReviewQuiz() {
     }
   }
 
+  const answeredCount = Object.keys(parsedAnswers).length
+  const totalQuestions = parsedQuestions.length
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Review Your Answers</Text>
 
-      <ScrollView>
+      {/* 🔥 Summary */}
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryText}>
+          Answered: {answeredCount} / {totalQuestions}
+        </Text>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
         {parsedQuestions.map((q, index) => {
           const isAnswered = parsedAnswers[index]
 
@@ -64,8 +77,11 @@ export default function ReviewQuiz() {
                 isAnswered ? styles.answered : styles.notAnswered
               ]}
             >
-              <Text style={styles.qText}>Question {index + 1}</Text>
-              <Text>
+              <Text style={styles.qText}>
+                Question {index + 1}
+              </Text>
+
+              <Text style={styles.statusText}>
                 {isAnswered ? 'Answered ✅' : 'Not Answered ❌'}
               </Text>
             </View>
@@ -73,20 +89,86 @@ export default function ReviewQuiz() {
         })}
       </ScrollView>
 
-      <TouchableOpacity style={styles.submitButton} onPress={submitQuiz}>
-        <Text style={styles.submitText}>Submit Final 🚀</Text>
+      {/* 🔥 Submit Button */}
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={submitQuiz}
+      >
+        <Text style={styles.submitText}>
+          Submit Final 🚀
+        </Text>
       </TouchableOpacity>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#eef2ff' },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
-  questionBox: { padding: 15, borderRadius: 10, marginBottom: 10 },
-  answered: { backgroundColor: '#d1fae5' },
-  notAnswered: { backgroundColor: '#fee2e2' },
-  qText: { fontWeight: 'bold' },
-  submitButton: { marginTop: 20, backgroundColor: '#4f46e5', padding: 15, borderRadius: 12, alignItems: 'center' },
-  submitText: { color: '#fff', fontWeight: 'bold' }
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#EEF2FF'
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#111'
+  },
+
+  summaryCard: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 15,
+    elevation: 3
+  },
+
+  summaryText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4F46E5',
+    textAlign: 'center'
+  },
+
+  questionBox: {
+    padding: 15,
+    borderRadius: 14,
+    marginBottom: 12
+  },
+
+  answered: {
+    backgroundColor: '#DCFCE7'
+  },
+
+  notAnswered: {
+    backgroundColor: '#FEE2E2'
+  },
+
+  qText: {
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginBottom: 5,
+    color: '#111'
+  },
+
+  statusText: {
+    fontSize: 14,
+    color: '#444'
+  },
+
+  submitButton: {
+    marginTop: 15,
+    backgroundColor: '#4F46E5',
+    padding: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    elevation: 4
+  },
+
+  submitText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16
+  }
 })

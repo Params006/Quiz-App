@@ -1,6 +1,13 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { supabase } from '../supabase'
 
 export default function JoinSubject() {
@@ -51,16 +58,21 @@ export default function JoinSubject() {
     <View style={styles.container}>
       <Text style={styles.title}>Join Subject</Text>
 
-      <TextInput
-        placeholder="Enter Join Code"
-        style={styles.input}
-        value={code}
-        onChangeText={setCode}
-      />
+      <View style={styles.card}>
 
-      <TouchableOpacity style={styles.button} onPress={handleJoin}>
-        <Text style={styles.buttonText}>Join Subject</Text>
-      </TouchableOpacity>
+        <Text style={styles.label}>Join Code</Text>
+        <TextInput
+          placeholder="Enter Join Code"
+          style={styles.input}
+          value={code}
+          onChangeText={setCode}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleJoin}>
+          <Text style={styles.buttonText}>Join Subject</Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   )
 }
@@ -68,33 +80,51 @@ export default function JoinSubject() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    justifyContent: 'center'
   },
+
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 30
+    color: '#111827',
+    marginBottom: 20
   },
+
+  card: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 16,
+    elevation: 4
+  },
+
+  label: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 6
+  },
+
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#fff',
     padding: 14,
     borderRadius: 10,
     marginBottom: 20,
-    backgroundColor: '#fff'
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    color: '#111827'
   },
+
   button: {
-    backgroundColor: '#34C759',
-    padding: 16,
-    borderRadius: 10,
+    backgroundColor: '#4F46E5',
+    padding: 15,
+    borderRadius: 12,
     alignItems: 'center'
   },
+
   buttonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: '600'
   }
 })

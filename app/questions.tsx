@@ -149,7 +149,7 @@ export default function Questions() {
               style={styles.input}
               value={correct}
               onChangeText={setCorrect}
-              autoCapitalize="characters"
+              autoCapitalize="none"
             />
 
             <View style={styles.modalButtons}>

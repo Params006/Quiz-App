@@ -130,7 +130,10 @@ export default function Questions() {
 
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <ScrollView contentContainerStyle={styles.modalContent}>
+          <ScrollView
+            contentContainerStyle={styles.modalContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled">
             <Text style={styles.modalTitle}>Add Question</Text>
 
             <TextInput
@@ -248,9 +251,10 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10,
-    width: '90%',
-    maxHeight: '80%'
+    borderRadius: 15,
+    width: '95%',
+    maxHeight: '85%',
+    alignSelf: 'center'
   },
   modalTitle: {
     fontSize: 24,
@@ -264,12 +268,14 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 10,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    color: '#000',
+    fontSize: 16
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10
+    marginTop: 15
   },
   modalButton: {
     backgroundColor: '#4F46E5',
